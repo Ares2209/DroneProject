@@ -2,6 +2,7 @@ package com.enac.crazyflie;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,72 +10,127 @@ import java.util.List;
 
 public class Mission {
 
+    // ─────────────────────────────────────────────
+    //  JSON Fields
+    // ─────────────────────────────────────────────
+
     @JsonProperty("waypoints")
     private List<MainController.Waypoint> waypoints;
 
     @JsonProperty("velocity")
     private double velocity;
 
+    @JsonProperty("canvasWidth")
+    private double canvasWidth;
+
+    @JsonProperty("canvasHeight")
+    private double canvasHeight;
+
+    // ─────────────────────────────────────────────
+    //  Constructors
+    // ─────────────────────────────────────────────
+
     public Mission() {}
 
-    public Mission(List<MainController.Waypoint> waypoints, double velocity) {
-        this.waypoints = waypoints;
-        this.velocity = velocity;
+    public Mission(List<MainController.Waypoint> waypoints, double velocity,
+                   double canvasWidth, double canvasHeight) {
+        this.waypoints    = waypoints;
+        this.velocity     = velocity;
+        this.canvasWidth  = canvasWidth;
+        this.canvasHeight = canvasHeight;
     }
 
-    public List<MainController.Waypoint> getWaypoints() {
-        return waypoints;
-    }
-
-    public void setWaypoints(List<MainController.Waypoint> waypoints) {
-        this.waypoints = waypoints;
-    }
-
-    public double getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(double velocity) {
-        this.velocity = velocity;
-    }
+    // ─────────────────────────────────────────────
+    //  Persistence
+    // ─────────────────────────────────────────────
 
     public void saveToFile(String filePath) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
+                .enable(SerializationFeature.INDENT_OUTPUT);
         mapper.writeValue(new File(filePath), this);
     }
 
     public static Mission loadFromFile(String filePath) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(new File(filePath), Mission.class);
+        return new ObjectMapper().readValue(new File(filePath), Mission.class);
     }
 
-    // Method to generate Python script
-    public String generatePythonScript() {
-        StringBuilder script = new StringBuilder();
-        script.append("# Generated Crazyflie mission script\n");
-        script.append("import cflib\n");
-        script.append("from cflib.crazyflie import Crazyflie\n");
-        script.append("from cflib.crazyflie.syncCrazyflie import SyncCrazyflie\n");
-        script.append("from cflib.positioning.position_hl_commander import PositionHlCommander\n");
-        script.append("\n");
-        script.append("# Initialize Crazyflie\n");
-        script.append("cf = Crazyflie(rw_cache='./cache')\n");
-        script.append("scf = SyncCrazyflie('radio://0/80/2M/E7E7E7E7E7', cf=cf)\n");
-        script.append("scf.open_link()\n");
-        script.append("pc = PositionHlCommander(scf, default_velocity=").append(velocity).append(", default_height=0.5)\n");
-        script.append("pc.take_off(0.5)\n");
-        script.append("\n");
+    // ─────────────────────────────────────────────
+    //  Python script generation
+    // ─────────────────────────────────────────────
 
-        for (int i = 1; i < waypoints.size(); i++) {
-            MainController.Waypoint prev = waypoints.get(i - 1);
-            MainController.Waypoint curr = waypoints.get(i);
-            script.append("pc.go_to(").append(curr.getX() / 100).append(", ").append(curr.getY() / 100).append(", ").append(curr.getAltitude()).append(")\n");
+    public String generatePythonScript() {
+        if (waypoints == null || waypoints.isEmpty()) {
+            throw new IllegalStateException("No waypoints defined in mission.");
         }
 
-        script.append("\n");
-        script.append("pc.land()\n");
-        script.append("scf.close_link()\n");
+        double originX = canvasWidth  / 2.0;
+        double originY = canvasHeight / 2.0;
 
-        return script.toString();
+        StringBuilder sb = new StringBuilder();
+
+        // ── Header ──
+        sb.append("\"\"\"\n");
+        sb.append("  Crazyflie Mission Script — Auto-generated\n");
+        sb.append("  Waypoints : ").append(waypoints.size()).append("\n");
+        sb.append("  Velocity  : ").append(velocity).append(" m/s\n");
+        sb.append("\"\"\"\n\n");
+
+        // ── Imports ──
+        sb.append("import time\n");
+        sb.append("import cflib.crtp\n");
+        sb.append("from cflib.crazyflie import Crazyflie\n");
+        sb.append("from cflib.crazyflie.syncCrazyflie import SyncCrazyflie\n");
+        sb.append("from cflib.positioning.position_hl_commander import PositionHlCommander\n\n");
+
+        // ── Config ──
+        sb.append("URI = 'radio://0/80/2M/E7E7E7E7E7'\n\n");
+
+        // ── Waypoint list ──
+        sb.append("WAYPOINTS = [\n");
+        for (MainController.Waypoint wp : waypoints) {
+            double worldX = (wp.getX() - originX) / 100.0;
+            double worldY = (wp.getY() - originY) / 100.0 * -1; // invert Y axis
+            sb.append(String.format("    (%.3f, %.3f, %.3f),\n",
+                    worldX, worldY, wp.getAltitude()));
+        }
+        sb.append("]\n\n");
+
+        // ── Mission function ──
+        sb.append("def run_mission(scf):\n");
+        sb.append("    with PositionHlCommander(\n");
+        sb.append("            scf,\n");
+        sb.append("            default_velocity=").append(velocity).append(",\n");
+        sb.append("            default_height=").append(waypoints.get(0).getAltitude()).append("\n");
+        sb.append("    ) as pc:\n");
+        sb.append("        time.sleep(1.0)  # stabilise after takeoff\n\n");
+        sb.append("        for i, (x, y, z) in enumerate(WAYPOINTS):\n");
+        sb.append("            print(f'Going to waypoint {i + 1}/{len(WAYPOINTS)}: x={x}, y={y}, z={z}')\n");
+        sb.append("            pc.go_to(x, y, z)\n");
+        sb.append("            time.sleep(0.5)\n\n");
+        sb.append("        print('Mission complete. Landing...')\n\n");
+
+        // ── Entry point ──
+        sb.append("if __name__ == '__main__':\n");
+        sb.append("    cflib.crtp.init_drivers()\n");
+        sb.append("    with SyncCrazyflie(URI, cf=Crazyflie(rw_cache='./cache')) as scf:\n");
+        sb.append("        run_mission(scf)\n");
+
+        return sb.toString();
     }
+
+    // ─────────────────────────────────────────────
+    //  Accessors
+    // ─────────────────────────────────────────────
+
+    public List<MainController.Waypoint> getWaypoints()              { return waypoints; }
+    public void setWaypoints(List<MainController.Waypoint> waypoints){ this.waypoints = waypoints; }
+
+    public double getVelocity()              { return velocity; }
+    public void   setVelocity(double v)      { this.velocity = v; }
+
+    public double getCanvasWidth()           { return canvasWidth; }
+    public void   setCanvasWidth(double w)   { this.canvasWidth = w; }
+
+    public double getCanvasHeight()          { return canvasHeight; }
+    public void   setCanvasHeight(double h)  { this.canvasHeight = h; }
 }

@@ -9,7 +9,6 @@
       fx:controller="com.enac.crazyflie.MainController"
       stylesheets="@styles.css">
 
-    <!-- ── Menu Bar ── -->
     <MenuBar>
         <Menu text="FILE">
             <MenuItem text="New Mission"  onAction="#newMission"/>
@@ -24,16 +23,12 @@
         </Menu>
     </MenuBar>
 
-    <!-- ── Main Layout ── -->
     <HBox VBox.vgrow="ALWAYS">
 
-        <!-- ── Side Panel ── -->
         <VBox styleClass="side-panel" spacing="0">
 
-            <!-- Header -->
             <Label text="MISSION CONTROL" styleClass="panel-header"/>
 
-            <!-- Controls section -->
             <VBox spacing="8" style="-fx-padding: 16 16 12 16;">
                 <Label text="WAYPOINTS" styleClass="section-label"/>
                 <Button text="+ ADD WAYPOINT"    onAction="#addWaypoint"
@@ -42,10 +37,8 @@
                         styleClass="btn-danger"   maxWidth="Infinity"/>
             </VBox>
 
-            <!-- Separator -->
             <Region styleClass="hud-divider"/>
 
-            <!-- Flight parameters -->
             <VBox spacing="8" style="-fx-padding: 12 16 12 16;">
                 <Label text="FLIGHT PARAMS" styleClass="section-label"/>
 
@@ -58,10 +51,8 @@
                            styleClass="input-field" promptText="0.1 – 2.0"/>
             </VBox>
 
-            <!-- Separator -->
             <Region styleClass="hud-divider"/>
 
-            <!-- Drawing controls -->
             <VBox spacing="8" style="-fx-padding: 12 16 16 16;">
                 <Label text="TRAJECTORY" styleClass="section-label"/>
                 <Button text="▶  START DRAWING" onAction="#startDrawing"
@@ -70,12 +61,10 @@
                         styleClass="btn-neutral" maxWidth="Infinity"/>
             </VBox>
 
-            <!-- Spacer -->
             <Region VBox.vgrow="ALWAYS"/>
 
         </VBox>
 
-        <!-- ── Canvas Area ── -->
         <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" styleClass="canvas-pane">
             <StackPane VBox.vgrow="ALWAYS" styleClass="canvas-wrapper">
                 <Canvas fx:id="trajectoryCanvas"
@@ -86,7 +75,6 @@
 
     </HBox>
 
-    <!-- ── Status Bar ── -->
     <HBox styleClass="status-bar" spacing="20" alignment="CENTER_LEFT">
         <Label text="●" styleClass="status-dot"/>
         <Label fx:id="statusLabel" text="READY" styleClass="status-text"/>

@@ -1,9 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   CRAZYFLIE MISSION CONTROL — Drone HUD Interface
-   Theme: Aerospace / Military dark — Cyan electric accent
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ── Root Variables ── */
 .root {
     -fx-background-color: #080c14;
     -fx-font-family: "Consolas", "Courier New", monospace;
@@ -24,9 +19,6 @@
     col-text-dim:   #3d5a73;
 }
 
-/* ══════════════════════════════════════════
-   MENU BAR
-   ══════════════════════════════════════════ */
 .menu-bar {
     -fx-background-color: #06090f;
     -fx-padding: 0 8 0 8;
@@ -86,9 +78,6 @@
     -fx-border-width: 1 0 0 0;
 }
 
-/* ══════════════════════════════════════════
-   SIDE PANEL
-   ══════════════════════════════════════════ */
 .side-panel {
     -fx-background-color: #0d1420;
     -fx-min-width: 220;
@@ -97,7 +86,6 @@
     -fx-border-width: 0 1 0 0;
 }
 
-/* Panel top header bar */
 .panel-header {
     -fx-background-color: #06090f;
     -fx-text-fill: #0ea5e9;
@@ -127,11 +115,7 @@
     -fx-padding: 0 0 2 0;
 }
 
-/* ══════════════════════════════════════════
-   BUTTONS
-   ══════════════════════════════════════════ */
 
-/* Primary — Add / Execute */
 .btn-primary {
     -fx-background-color: #0ea5e9;
     -fx-text-fill: #06090f;
@@ -157,7 +141,6 @@
     -fx-effect: dropshadow(gaussian, rgba(14, 165, 233, 0.2), 4, 0, 0, 1);
 }
 
-/* Danger / Clear */
 .btn-danger {
     -fx-background-color: transparent;
     -fx-text-fill: #f43f5e;
@@ -183,7 +166,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* Success / Start */
 .btn-success {
     -fx-background-color: transparent;
     -fx-text-fill: #22d3a0;
@@ -210,7 +192,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* Neutral / Stop */
 .btn-neutral {
     -fx-background-color: transparent;
     -fx-text-fill: #3d5a73;
@@ -236,9 +217,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* ══════════════════════════════════════════
-   TEXT FIELDS
-   ══════════════════════════════════════════ */
 .input-field {
     -fx-background-color: #080c14;
     -fx-text-fill: #e2eaf4;
@@ -260,9 +238,6 @@
     -fx-border-color: #2d5a7a;
 }
 
-/* ══════════════════════════════════════════
-   CANVAS AREA
-   ══════════════════════════════════════════ */
 .canvas-pane {
     -fx-background-color: #080c14;
     -fx-padding: 12;
@@ -270,7 +245,6 @@
     -fx-border-width: 1;
 }
 
-/* Canvas wrapper — subtle inner glow on hover */
 .canvas-wrapper {
     -fx-background-color: #0a0f18;
     -fx-border-color: #1e3a5f;
@@ -283,9 +257,6 @@
                 dropshadow(gaussian, rgba(14, 165, 233, 0.1), 16, 0, 0, 0);
 }
 
-/* ══════════════════════════════════════════
-   STATUS BAR
-   ══════════════════════════════════════════ */
 .status-bar {
     -fx-background-color: #06090f;
     -fx-padding: 7 16 7 16;
@@ -324,9 +295,6 @@
     -fx-font-size: 10px;
 }
 
-/* ══════════════════════════════════════════
-   COORDINATE / TELEMETRY READOUT LABELS
-   ══════════════════════════════════════════ */
 .telemetry-label {
     -fx-text-fill: #0ea5e9;
     -fx-font-family: "Consolas", monospace;
@@ -349,9 +317,6 @@
     -fx-effect: dropshadow(gaussian, rgba(34, 211, 160, 0.5), 6, 0, 0, 0);
 }
 
-/* ══════════════════════════════════════════
-   SCROLL PANE (waypoint list)
-   ══════════════════════════════════════════ */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -376,9 +341,6 @@
     -fx-padding: 0;
 }
 
-/* ══════════════════════════════════════════
-   WAYPOINT LIST ITEMS
-   ══════════════════════════════════════════ */
 .waypoint-item {
     -fx-background-color: #0d1420;
     -fx-border-color: #1e3a5f;
@@ -404,18 +366,13 @@
     -fx-font-size: 11px;
 }
 
-/* ══════════════════════════════════════════
-   DIVIDERS / GRID LINES
-   ══════════════════════════════════════════ */
 .hud-divider {
     -fx-border-color: #1e3a5f;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 6 0 0 0;
 }
 
-/* ══════════════════════════════════════════
-   TOOLTIP
-   ══════════════════════════════════════════ */
+
 .tooltip {
     -fx-background-color: #0d1420;
     -fx-text-fill: #8aaabf;
@@ -428,9 +385,7 @@
     -fx-effect: dropshadow(gaussian, rgba(14, 165, 233, 0.2), 8, 0, 0, 3);
 }
 
-/* ══════════════════════════════════════════
-   COMBO BOX (if used for drone mode select)
-   ══════════════════════════════════════════ */
+
 .combo-box {
     -fx-background-color: #080c14;
     -fx-text-fill: #e2eaf4;
@@ -471,9 +426,6 @@
     -fx-text-fill: #0ea5e9;
 }
 
-/* ══════════════════════════════════════════
-   PROGRESS BAR (battery / signal strength)
-   ══════════════════════════════════════════ */
 .progress-bar {
     -fx-background-color: #0d1420;
     -fx-border-color: #1e3a5f;
@@ -491,9 +443,6 @@
     -fx-background-color: #0ea5e9;
 }
 
-/* ══════════════════════════════════════════
-   CHECK BOX
-   ══════════════════════════════════════════ */
 .check-box {
     -fx-text-fill: #8aaabf;
     -fx-font-family: "Consolas", monospace;
@@ -517,9 +466,6 @@
     -fx-border-color: #0ea5e9;
 }
 
-/* ══════════════════════════════════════════
-   ALERT / DIALOG
-   ══════════════════════════════════════════ */
 .dialog-pane {
     -fx-background-color: #0d1420;
     -fx-border-color: #1e3a5f;

@@ -63,8 +63,9 @@ public class Mission {
             throw new IllegalStateException("No waypoints defined in mission.");
         }
 
-        double originX = canvasWidth  / 2.0;
-        double originY = canvasHeight / 2.0;
+        // Waypoints are stored in world coords (origin = canvas centre, Y-up).
+        // Scale: 100 px = 1 m
+        final double PX_PER_METRE = 100.0;
 
         StringBuilder sb = new StringBuilder();
 
@@ -88,8 +89,9 @@ public class Mission {
         // ── Waypoint list ──
         sb.append("WAYPOINTS = [\n");
         for (MainController.Waypoint wp : waypoints) {
-            double worldX = (wp.getX() - originX) / 100.0;
-            double worldY = (wp.getY() - originY) / 100.0 * -1; // invert Y axis
+            // Waypoints already centred (0,0 = origin) and Y-up → divide by scale only
+            double worldX = wp.getX() / PX_PER_METRE;
+            double worldY = wp.getY() / PX_PER_METRE;
             sb.append(String.format("    (%.3f, %.3f, %.3f),\n",
                     worldX, worldY, wp.getAltitude()));
         }
@@ -117,10 +119,6 @@ public class Mission {
 
         return sb.toString();
     }
-
-    // ─────────────────────────────────────────────
-    //  Accessors
-    // ─────────────────────────────────────────────
 
     public List<MainController.Waypoint> getWaypoints()              { return waypoints; }
     public void setWaypoints(List<MainController.Waypoint> waypoints){ this.waypoints = waypoints; }

@@ -26,25 +26,13 @@ import java.util.Optional;
 
 public class MainController {
 
-    // ─────────────────────────────────────────────
-    //  FXML Bindings
-    // ─────────────────────────────────────────────
-
     @FXML private Canvas    trajectoryCanvas;
     @FXML private TextField altitudeField;
     @FXML private TextField velocityField;
     @FXML private Label     statusLabel;
 
-    // ─────────────────────────────────────────────
-    //  State
-    // ─────────────────────────────────────────────
-
     private final List<Waypoint> waypoints = new ArrayList<>();
     private boolean drawing = false;
-
-    // ─────────────────────────────────────────────
-    //  Init
-    // ─────────────────────────────────────────────
 
     @FXML
     private void initialize() {
@@ -52,39 +40,30 @@ public class MainController {
         setStatus("READY", StatusType.OK);
     }
 
-    // ─────────────────────────────────────────────
-    //  Canvas
-    // ─────────────────────────────────────────────
-
     @FXML
     private void canvasClicked(MouseEvent event) {
         if (!drawing) return;
-        double x   = event.getX();
-        double y   = event.getY();
+        // Convert canvas pixels → world coords (origin = canvas centre, Y-up)
+        double wx  = event.getX() - trajectoryCanvas.getWidth()  / 2.0;
+        double wy  = -(event.getY() - trajectoryCanvas.getHeight() / 2.0);
         double alt = parseDouble(altitudeField.getText(), 1.0);
-        waypoints.add(new Waypoint(x, y, alt));
+        waypoints.add(new Waypoint(wx, wy, alt));
         drawTrajectory();
         setStatus(String.format("WP%02d  ->  X:%.0f  Y:%.0f  ALT:%.1fm",
-                waypoints.size(), x, y, alt), StatusType.OK);
+                waypoints.size(), wx, wy, alt), StatusType.OK);
     }
 
-    // ─────────────────────────────────────────────
-    //  Drawing controls
-    // ─────────────────────────────────────────────
-
-    @FXML private void startDrawing() {
+    @FXML 
+    public void startDrawing() {
         drawing = true;
         setStatus("DRAWING MODE  -  CLICK ON MAP TO ADD WAYPOINTS", StatusType.OK);
     }
 
-    @FXML private void stopDrawing() {
+    @FXML 
+    public void stopDrawing() {
         drawing = false;
         setStatus("DRAWING STOPPED  -  " + waypoints.size() + " WAYPOINTS RECORDED", StatusType.IDLE);
     }
-
-    // ─────────────────────────────────────────────
-    //  Add Waypoint — manual dialog
-    // ─────────────────────────────────────────────
 
     @FXML
     private void addWaypoint() {
@@ -104,9 +83,9 @@ public class MainController {
         TextField yField   = styledField("0");
         TextField altField = styledField(altitudeField.getText());
 
-        grid.add(new Label("X (px):"),       0, 0); grid.add(xField,   1, 0);
-        grid.add(new Label("Y (px):"),       0, 1); grid.add(yField,   1, 1);
-        grid.add(new Label("Altitude (m):"), 0, 2); grid.add(altField, 1, 2);
+        grid.add(new Label("X  (px, 0=centre):"), 0, 0); grid.add(xField,   1, 0);
+        grid.add(new Label("Y  (px, 0=centre):"), 0, 1); grid.add(yField,   1, 1);
+        grid.add(new Label("Altitude (m):"),       0, 2); grid.add(altField, 1, 2);
 
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(btn -> btn == addBtn
@@ -123,10 +102,6 @@ public class MainController {
         });
     }
 
-    // ─────────────────────────────────────────────
-    //  Clear
-    // ─────────────────────────────────────────────
-
     @FXML
     private void clearTrajectory() {
         if (waypoints.isEmpty()) { setStatus("NO WAYPOINTS TO CLEAR", StatusType.IDLE); return; }
@@ -137,12 +112,8 @@ public class MainController {
         });
     }
 
-    // ─────────────────────────────────────────────
-    //  File — New
-    // ─────────────────────────────────────────────
-
     @FXML
-    private void newMission() {
+    public void newMission() {
         if (waypoints.isEmpty()) { resetMission(); return; }
         confirmDialog("New Mission", "Unsaved waypoints will be lost. Continue?", this::resetMission);
     }
@@ -153,12 +124,8 @@ public class MainController {
         setStatus("NEW MISSION STARTED", StatusType.OK);
     }
 
-    // ─────────────────────────────────────────────
-    //  File — Save  (delegates to Mission)
-    // ─────────────────────────────────────────────
-
     @FXML
-    private void saveMission() {
+    public void saveMission() {
         if (waypoints.isEmpty()) {
             setStatus("NOTHING TO SAVE  -  ADD WAYPOINTS FIRST", StatusType.IDLE);
             return;
@@ -175,10 +142,6 @@ public class MainController {
             setStatus("SAVE ERROR", StatusType.ERROR);
         }
     }
-
-    // ─────────────────────────────────────────────
-    //  File — Load  (delegates to Mission)
-    // ─────────────────────────────────────────────
 
     @FXML
     private void loadMission() {
@@ -203,10 +166,6 @@ public class MainController {
         }
     }
 
-    // ─────────────────────────────────────────────
-    //  Generate Python Script  (delegates to Mission)
-    // ─────────────────────────────────────────────
-
     @FXML
     private void generateScript() {
         if (waypoints.isEmpty()) {
@@ -226,10 +185,6 @@ public class MainController {
             setStatus("SCRIPT ERROR", StatusType.ERROR);
         }
     }
-
-    // ─────────────────────────────────────────────
-    //  Execute Mission  (async simulation)
-    // ─────────────────────────────────────────────
 
     @FXML
     private void executeMission() {
@@ -282,51 +237,59 @@ public class MainController {
         };
     }
 
-    // ─────────────────────────────────────────────
-    //  Exit
-    // ─────────────────────────────────────────────
-
     @FXML private void exit() { Platform.exit(); }
-
-    // ─────────────────────────────────────────────
-    //  Canvas rendering
-    // ─────────────────────────────────────────────
 
     private void drawTrajectory() {
         GraphicsContext gc = trajectoryCanvas.getGraphicsContext2D();
         double w = trajectoryCanvas.getWidth();
         double h = trajectoryCanvas.getHeight();
+        double ox = w / 2.0;  
+        double oy = h / 2.0;  
 
         gc.setFill(Color.web("#080c14"));
         gc.fillRect(0, 0, w, h);
 
-        // Grid
-        gc.setStroke(Color.web("#1e3a5f", 0.5));
+        gc.setStroke(Color.web("#ffffff", 0.5));
         gc.setLineWidth(0.5);
         for (double x = 0; x < w; x += 50) gc.strokeLine(x, 0, x, h);
         for (double y = 0; y < h; y += 50) gc.strokeLine(0, y, w, y);
 
-        // Origin crosshair
-        gc.setStroke(Color.web("#0ea5e9", 0.2));
+        gc.setStroke(Color.web("#0ea5e9", 0.35));
         gc.setLineWidth(1);
-        gc.strokeLine(w / 2, 0, w / 2, h);
-        gc.strokeLine(0, h / 2, w, h / 2);
+        gc.strokeLine(ox, 0, ox, h);
+        gc.strokeLine(0, oy, w, oy);
+
+        gc.setFont(Font.font("Consolas", 9));
+        gc.setFill(Color.web("#ffffff"));
+        for (double x = -ox; x <= ox; x += 100) {
+            if (x == 0) continue;
+            double px = ox + x;
+            gc.fillText(String.format("%.0f", x), px + 2, oy - 3);
+        }
+        for (double y = -oy; y <= oy; y += 100) {
+            if (y == 0) continue;
+            double py = oy - y;   // invert Y
+            gc.fillText(String.format("%.0f", y), ox + 3, py - 2);
+        }
+
+        gc.setFill(Color.web("#0ea5e9", 0.5));
+        gc.fillText("0,0", ox + 4, oy - 4);
 
         if (waypoints.isEmpty()) return;
 
-        // Trajectory lines
         gc.setStroke(Color.web("#0ea5e9"));
         gc.setLineWidth(2);
         for (int i = 1; i < waypoints.size(); i++) {
             Waypoint p = waypoints.get(i - 1), c = waypoints.get(i);
-            gc.strokeLine(p.getX(), p.getY(), c.getX(), c.getY());
+            gc.strokeLine(ox + p.getX(), oy - p.getY(),
+                          ox + c.getX(), oy - c.getY());
         }
 
-        // Markers
         gc.setFont(Font.font("Consolas", 10));
         for (int i = 0; i < waypoints.size(); i++) {
             Waypoint wp = waypoints.get(i);
-            double cx = wp.getX(), cy = wp.getY();
+            double cx = ox + wp.getX();
+            double cy = oy - wp.getY();   // invert Y
 
             gc.setStroke(Color.web("#0ea5e9", 0.25));
             gc.setLineWidth(6);
@@ -339,22 +302,25 @@ public class MainController {
 
             gc.setFill(Color.web("#e2eaf4"));
             gc.fillText(String.format("WP%02d", i + 1), cx + 8, cy - 6);
+            gc.setFill(Color.web("#ffffff"));
+            gc.fillText(String.format("%.1fm", wp.getAltitude()), cx + 8, cy + 6);
         }
     }
 
     private void animateWaypointReached(int index) {
         GraphicsContext gc = trajectoryCanvas.getGraphicsContext2D();
         Waypoint wp = waypoints.get(index);
+        double cx = trajectoryCanvas.getWidth()  / 2.0 + wp.getX();   // world → pixel X
+        double cy = trajectoryCanvas.getHeight() / 2.0 - wp.getY();   // world → pixel Y (inverted)
         gc.setStroke(Color.web("#22d3a0", 0.8));
         gc.setLineWidth(3);
-        gc.strokeOval(wp.getX() - 14, wp.getY() - 14, 28, 28);
+        gc.strokeOval(cx - 14, cy - 14, 28, 28);
     }
 
     // ─────────────────────────────────────────────
     //  Helpers
     // ─────────────────────────────────────────────
 
-    /** Builds a Mission snapshot from current UI state. */
     private Mission buildMission() {
         return new Mission(
                 new ArrayList<>(waypoints),
@@ -423,17 +389,12 @@ public class MainController {
         a.showAndWait();
     }
 
-    // ─────────────────────────────────────────────
-    //  Waypoint  (Jackson-serialisable)
-    // ─────────────────────────────────────────────
-
     public static class Waypoint {
 
         @JsonProperty("x")        private final double x;
         @JsonProperty("y")        private final double y;
         @JsonProperty("altitude") private final double altitude;
 
-        /** No-arg constructor required by Jackson. */
         @JsonCreator
         public Waypoint(
                 @JsonProperty("x")        double x,

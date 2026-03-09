@@ -1,0 +1,146 @@
+/* ── Root ── */
+.root {
+    -fx-background-color: #1e1e2e;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ── MenuBar ── */
+.menu-bar {
+    -fx-background-color: #181825;
+    -fx-padding: 2 0 2 0;
+}
+.menu-bar .menu .label {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 13px;
+}
+.menu-bar .menu:hover,
+.menu-bar .menu:focused,
+.menu-bar .menu:showing {
+    -fx-background-color: #313244;
+}
+.context-menu {
+    -fx-background-color: #181825;
+    -fx-border-color: #313244;
+    -fx-border-width: 1;
+}
+.menu-item .label {
+    -fx-text-fill: #cdd6f4;
+}
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #313244;
+}
+
+/* ── Side Panel ── */
+.side-panel {
+    -fx-background-color: #181825;
+    -fx-min-width: 210;
+    -fx-border-color: #313244;
+    -fx-border-width: 0 0 0 1;
+}
+.panel-header {
+    -fx-text-fill: #89b4fa;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 16 16 12 16;
+    -fx-border-color: #313244;
+    -fx-border-width: 0 0 1 0;
+}
+.section-label {
+    -fx-text-fill: #a6adc8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.field-label {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 11px;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: #b4d0fe;
+}
+.btn-danger {
+    -fx-background-color: #313244;
+    -fx-text-fill: #f38ba8;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+}
+.btn-danger:hover {
+    -fx-background-color: #45475a;
+}
+.btn-success {
+    -fx-background-color: #a6e3a1;
+    -fx-text-fill: #1e1e2e;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+}
+.btn-success:hover {
+    -fx-background-color: #cffab4;
+}
+.btn-neutral {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12 8 12;
+    -fx-cursor: hand;
+}
+.btn-neutral:hover {
+    -fx-background-color: #45475a;
+}
+
+/* ── Text Fields ── */
+.input-field {
+    -fx-background-color: #313244;
+    -fx-text-fill: #cdd6f4;
+    -fx-border-color: #45475a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+.input-field:focused {
+    -fx-border-color: #89b4fa;
+}
+
+/* ── Canvas area ── */
+.canvas-pane {
+    -fx-background-color: #181825;
+    -fx-padding: 16;
+}
+
+/* ── Status bar ── */
+.status-bar {
+    -fx-background-color: #11111b;
+    -fx-padding: 6 16 6 16;
+    -fx-border-color: #313244;
+    -fx-border-width: 1 0 0 0;
+}
+.status-dot {
+    -fx-text-fill: #a6e3a1;
+    -fx-font-size: 10px;
+}
+.status-text {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 11px;
+}
+
+/* ── Separator ── */
+.separator .line {
+    -fx-border-color: #313244;
+    -fx-border-width: 1 0 0 0;
+}

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.*?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.enac.crazyflie.MainController">
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.enac.crazyflie.MainController" stylesheets="@styles.css">
     <MenuBar>
         <Menu text="File">
             <MenuItem text="New Mission" onAction="#newMission"/>

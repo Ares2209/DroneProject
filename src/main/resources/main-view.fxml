@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.*?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.enac.crazyflie.MainController">
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem text="New Mission" onAction="#newMission"/>
+            <MenuItem text="Load Mission" onAction="#loadMission"/>
+            <MenuItem text="Save Mission" onAction="#saveMission"/>
+            <SeparatorMenuItem/>
+            <MenuItem text="Exit" onAction="#exit"/>
+        </Menu>
+        <Menu text="Mission">
+            <MenuItem text="Generate Python Script" onAction="#generateScript"/>
+            <MenuItem text="Execute Mission" onAction="#executeMission"/>
+        </Menu>
+    </MenuBar>
+    <HBox>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Mission Controls"/>
+            <Button text="Add Waypoint" onAction="#addWaypoint"/>
+            <Button text="Clear Trajectory" onAction="#clearTrajectory"/>
+            <Label text="Altitude:"/>
+            <TextField fx:id="altitudeField" text="1.0"/>
+            <Label text="Velocity:"/>
+            <TextField fx:id="velocityField" text="0.5"/>
+        </VBox>
+        <VBox VBox.vgrow="ALWAYS">
+            <Canvas fx:id="trajectoryCanvas" width="600" height="400" onMouseClicked="#canvasClicked"/>
+        </VBox>
+    </HBox>
+    <HBox style="-fx-padding: 10;">
+        <Button text="Start Drawing" onAction="#startDrawing"/>
+        <Button text="Stop Drawing" onAction="#stopDrawing"/>
+        <Label fx:id="statusLabel" text="Ready"/>
+    </HBox>
+</VBox>

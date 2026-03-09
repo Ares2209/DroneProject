@@ -4,37 +4,97 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.*?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.enac.crazyflie.MainController" stylesheets="@styles.css">
+<VBox xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.enac.crazyflie.MainController"
+      stylesheets="@styles.css">
+
+    <!-- ── Menu Bar ── -->
     <MenuBar>
-        <Menu text="File">
-            <MenuItem text="New Mission" onAction="#newMission"/>
+        <Menu text="FILE">
+            <MenuItem text="New Mission"  onAction="#newMission"/>
             <MenuItem text="Load Mission" onAction="#loadMission"/>
             <MenuItem text="Save Mission" onAction="#saveMission"/>
             <SeparatorMenuItem/>
             <MenuItem text="Exit" onAction="#exit"/>
         </Menu>
-        <Menu text="Mission">
+        <Menu text="MISSION">
             <MenuItem text="Generate Python Script" onAction="#generateScript"/>
-            <MenuItem text="Execute Mission" onAction="#executeMission"/>
+            <MenuItem text="Execute Mission"         onAction="#executeMission"/>
         </Menu>
     </MenuBar>
-    <HBox>
-        <VBox spacing="10" style="-fx-padding: 10;">
-            <Label text="Mission Controls"/>
-            <Button text="Add Waypoint" onAction="#addWaypoint"/>
-            <Button text="Clear Trajectory" onAction="#clearTrajectory"/>
-            <Label text="Altitude:"/>
-            <TextField fx:id="altitudeField" text="1.0"/>
-            <Label text="Velocity:"/>
-            <TextField fx:id="velocityField" text="0.5"/>
+
+    <!-- ── Main Layout ── -->
+    <HBox VBox.vgrow="ALWAYS">
+
+        <!-- ── Side Panel ── -->
+        <VBox styleClass="side-panel" spacing="0">
+
+            <!-- Header -->
+            <Label text="MISSION CONTROL" styleClass="panel-header"/>
+
+            <!-- Controls section -->
+            <VBox spacing="8" style="-fx-padding: 16 16 12 16;">
+                <Label text="WAYPOINTS" styleClass="section-label"/>
+                <Button text="+ ADD WAYPOINT"    onAction="#addWaypoint"
+                        styleClass="btn-primary"  maxWidth="Infinity"/>
+                <Button text="CLEAR TRAJECTORY"  onAction="#clearTrajectory"
+                        styleClass="btn-danger"   maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Separator -->
+            <Region styleClass="hud-divider"/>
+
+            <!-- Flight parameters -->
+            <VBox spacing="8" style="-fx-padding: 12 16 12 16;">
+                <Label text="FLIGHT PARAMS" styleClass="section-label"/>
+
+                <Label text="ALTITUDE  (m)" styleClass="field-label"/>
+                <TextField fx:id="altitudeField" text="1.0"
+                           styleClass="input-field" promptText="0.0 – 10.0"/>
+
+                <Label text="VELOCITY  (m/s)" styleClass="field-label"/>
+                <TextField fx:id="velocityField" text="0.5"
+                           styleClass="input-field" promptText="0.1 – 2.0"/>
+            </VBox>
+
+            <!-- Separator -->
+            <Region styleClass="hud-divider"/>
+
+            <!-- Drawing controls -->
+            <VBox spacing="8" style="-fx-padding: 12 16 16 16;">
+                <Label text="TRAJECTORY" styleClass="section-label"/>
+                <Button text="▶  START DRAWING" onAction="#startDrawing"
+                        styleClass="btn-success" maxWidth="Infinity"/>
+                <Button text="■  STOP DRAWING"  onAction="#stopDrawing"
+                        styleClass="btn-neutral" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- Spacer -->
+            <Region VBox.vgrow="ALWAYS"/>
+
         </VBox>
-        <VBox VBox.vgrow="ALWAYS">
-            <Canvas fx:id="trajectoryCanvas" width="600" height="400" onMouseClicked="#canvasClicked"/>
+
+        <!-- ── Canvas Area ── -->
+        <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" styleClass="canvas-pane">
+            <StackPane VBox.vgrow="ALWAYS" styleClass="canvas-wrapper">
+                <Canvas fx:id="trajectoryCanvas"
+                        width="600" height="400"
+                        onMouseClicked="#canvasClicked"/>
+            </StackPane>
         </VBox>
+
     </HBox>
-    <HBox style="-fx-padding: 10;">
-        <Button text="Start Drawing" onAction="#startDrawing"/>
-        <Button text="Stop Drawing" onAction="#stopDrawing"/>
-        <Label fx:id="statusLabel" text="Ready"/>
+
+    <!-- ── Status Bar ── -->
+    <HBox styleClass="status-bar" spacing="20" alignment="CENTER_LEFT">
+        <Label text="●" styleClass="status-dot"/>
+        <Label fx:id="statusLabel" text="READY" styleClass="status-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="DRONE" styleClass="status-text"/>
+        <Label text="CF-2X" styleClass="status-value"/>
+        <Label text="SIG" styleClass="status-text"/>
+        <Label text="–" styleClass="status-value"/>
     </HBox>
+
 </VBox>

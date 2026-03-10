@@ -317,10 +317,6 @@ public class MainController {
         gc.strokeOval(cx - 14, cy - 14, 28, 28);
     }
 
-    // ─────────────────────────────────────────────
-    //  Helpers
-    // ─────────────────────────────────────────────
-
     private Mission buildMission() {
         return new Mission(
                 new ArrayList<>(waypoints),

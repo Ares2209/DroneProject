@@ -10,10 +10,6 @@ import java.util.List;
 
 public class Mission {
 
-    // ─────────────────────────────────────────────
-    //  JSON Fields
-    // ─────────────────────────────────────────────
-
     @JsonProperty("waypoints")
     private List<MainController.Waypoint> waypoints;
 
@@ -26,10 +22,6 @@ public class Mission {
     @JsonProperty("canvasHeight")
     private double canvasHeight;
 
-    // ─────────────────────────────────────────────
-    //  Constructors
-    // ─────────────────────────────────────────────
-
     public Mission() {}
 
     public Mission(List<MainController.Waypoint> waypoints, double velocity,
@@ -39,10 +31,6 @@ public class Mission {
         this.canvasWidth  = canvasWidth;
         this.canvasHeight = canvasHeight;
     }
-
-    // ─────────────────────────────────────────────
-    //  Persistence
-    // ─────────────────────────────────────────────
 
     public void saveToFile(String filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper()
@@ -54,42 +42,30 @@ public class Mission {
         return new ObjectMapper().readValue(new File(filePath), Mission.class);
     }
 
-    // ─────────────────────────────────────────────
-    //  Python script generation
-    // ─────────────────────────────────────────────
-
     public String generatePythonScript() {
         if (waypoints == null || waypoints.isEmpty()) {
             throw new IllegalStateException("No waypoints defined in mission.");
         }
 
-        // Waypoints are stored in world coords (origin = canvas centre, Y-up).
-        // Scale: 100 px = 1 m
         final double PX_PER_METRE = 100.0;
 
         StringBuilder sb = new StringBuilder();
 
-        // ── Header ──
         sb.append("\"\"\"\n");
-        sb.append("  Crazyflie Mission Script — Auto-generated\n");
         sb.append("  Waypoints : ").append(waypoints.size()).append("\n");
         sb.append("  Velocity  : ").append(velocity).append(" m/s\n");
         sb.append("\"\"\"\n\n");
 
-        // ── Imports ──
         sb.append("import time\n");
         sb.append("import cflib.crtp\n");
         sb.append("from cflib.crazyflie import Crazyflie\n");
         sb.append("from cflib.crazyflie.syncCrazyflie import SyncCrazyflie\n");
         sb.append("from cflib.positioning.position_hl_commander import PositionHlCommander\n\n");
 
-        // ── Config ──
         sb.append("URI = 'radio://0/80/2M/E7E7E7E7E7'\n\n");
 
-        // ── Waypoint list ──
         sb.append("WAYPOINTS = [\n");
         for (MainController.Waypoint wp : waypoints) {
-            // Waypoints already centred (0,0 = origin) and Y-up → divide by scale only
             double worldX = wp.getX() / PX_PER_METRE;
             double worldY = wp.getY() / PX_PER_METRE;
             sb.append(String.format("    (%.3f, %.3f, %.3f),\n",
@@ -97,7 +73,6 @@ public class Mission {
         }
         sb.append("]\n\n");
 
-        // ── Mission function ──
         sb.append("def run_mission(scf):\n");
         sb.append("    with PositionHlCommander(\n");
         sb.append("            scf,\n");
@@ -111,7 +86,6 @@ public class Mission {
         sb.append("            time.sleep(0.5)\n\n");
         sb.append("        print('Mission complete. Landing...')\n\n");
 
-        // ── Entry point ──
         sb.append("if __name__ == '__main__':\n");
         sb.append("    cflib.crtp.init_drivers()\n");
         sb.append("    with SyncCrazyflie(URI, cf=Crazyflie(rw_cache='./cache')) as scf:\n");

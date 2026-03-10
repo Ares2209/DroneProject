@@ -1,15 +1,12 @@
 package com.enac.crazyflie;
 
 import javafx.application.Application;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.animation.FadeTransition;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.input.*;
-import javafx.stage.Screen;
-import javafx.util.Duration;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.application.Platform;

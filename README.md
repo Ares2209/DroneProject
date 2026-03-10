@@ -41,6 +41,9 @@ Cette application permet aux développeurs de planifier des trajectoires pour le
 5. Générer le script Python via le menu Mission
 6. Exécuter la mission (nécessite un drone Crazyflie connecté)
 
-## Développement
+## Améliration à faire 
 
-Le projet utilise JavaFX pour l'interface graphique et Jackson pour la sérialisation JSON. Les trajectoires sont représentées par des listes de waypoints avec coordonnées x, y et altitude.
+Rajouter la distance sur les traits entre les différents waypoints
+Rajouter la possibilité d'une séléction de point et de leur déplacement. 
+Rajouter la possibilité de zoomer
+Rajouter la modification de notre type de drone. 

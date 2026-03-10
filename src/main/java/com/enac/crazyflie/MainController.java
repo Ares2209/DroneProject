@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -43,7 +45,6 @@ public class MainController {
     @FXML
     private void canvasClicked(MouseEvent event) {
         if (!drawing) return;
-        // Convert canvas pixels → world coords (origin = canvas centre, Y-up)
         double wx  = event.getX() - trajectoryCanvas.getWidth()  / 2.0;
         double wy  = -(event.getY() - trajectoryCanvas.getHeight() / 2.0);
         double alt = parseDouble(altitudeField.getText(), 1.0);
@@ -64,6 +65,19 @@ public class MainController {
         drawing = false;
         setStatus("DRAWING STOPPED  -  " + waypoints.size() + " WAYPOINTS RECORDED", StatusType.IDLE);
     }
+
+    @FXML 
+    public void SelectDroneStatut() {
+        setStatus("Selection Drone", StatusType.IDLE);
+    }
+    @FXML 
+    public void ModWaypointStatut() {
+        setStatus("Modification Waypoint", StatusType.IDLE);
+    }
+
+
+
+
 
     @FXML
     private void addWaypoint() {
@@ -101,7 +115,6 @@ public class MainController {
                     waypoints.size(), wp.getX(), wp.getY(), wp.getAltitude()), StatusType.OK);
         });
     }
-
     @FXML
     private void clearTrajectory() {
         if (waypoints.isEmpty()) { setStatus("NO WAYPOINTS TO CLEAR", StatusType.IDLE); return; }
@@ -110,6 +123,11 @@ public class MainController {
             drawTrajectory();
             setStatus("TRAJECTORY CLEARED", StatusType.IDLE);
         });
+    }
+    @FXML
+    public void SelectDrone() {
+        if (waypoints.isEmpty()) { resetMission(); return; }
+        confirmDialog("Select Drone", "Unsaved waypoints will be lost. Continue?", this::SelectNewDrone); 
     }
 
     @FXML
@@ -185,6 +203,79 @@ public class MainController {
             setStatus("SCRIPT ERROR", StatusType.ERROR);
         }
     }
+
+    private ObservableList<Drone> droneList = FXCollections.observableArrayList(
+        new Drone("Drone Alpha",   "DJI Mavic 3",      120.0, 68.4, 300.0),
+        new Drone("Drone Beta",    "DJI Phantom 4",    100.0, 72.0, 100.0),
+        new Drone("Drone Gamma",   "Parrot Anafi",      90.0, 55.0, 100.0),
+        new Drone("Drone Delta",   "Autel EVO II",     110.0, 72.0, 100.0),
+        new Drone("Drone Epsilon", "Skydio 2+",         80.0, 58.0, 100.0)
+    );
+
+    private Drone selectedDrone = null; 
+
+    @FXML
+    private void SelectNewDrone() {
+        Dialog<Drone> dialog = new Dialog<>();
+        dialog.setTitle("Select New Drone");
+        dialog.setHeaderText("Select a drone from the list");
+
+        ButtonType selectBtn = new ButtonType("Select", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(selectBtn, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(16));
+
+        Label nameHeader     = new Label("Name");
+        Label modelHeader    = new Label("Model");
+        Label speedHeader    = new Label("Max Speed (km/h)");
+        Label batteryHeader  = new Label("Battery (Wh)");
+        Label rangeHeader    = new Label("Range (km)");
+
+        grid.add(nameHeader,    1, 0);
+        grid.add(modelHeader,   2, 0);
+        grid.add(speedHeader,   3, 0);
+        grid.add(batteryHeader, 4, 0);
+        grid.add(rangeHeader,   5, 0);
+
+        // Groupe de radio buttons
+        ToggleGroup toggleGroup = new ToggleGroup();
+
+        for (int i = 0; i < droneList.size(); i++) {
+            Drone drone = droneList.get(i);
+
+            RadioButton rb = new RadioButton();
+            rb.setToggleGroup(toggleGroup);
+            rb.setUserData(drone);
+
+            if (drone.equals(selectedDrone)) {
+                rb.setSelected(true);
+            }
+
+            Label nameLabel    = new Label(drone.getName());
+            Label modelLabel   = new Label(drone.getModel());
+
+
+            grid.add(rb,           0, i + 1);
+            grid.add(nameLabel,    1, i + 1);
+            grid.add(modelLabel,   2, i + 1);
+
+        }
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(btn -> btn == selectBtn
+                ? (Drone) toggleGroup.getSelectedToggle().getUserData()
+                : null);
+
+        dialog.showAndWait().ifPresent(drone -> {
+            selectedDrone = drone;
+            drawTrajectory();
+            setStatus(String.format("DRONE SELECTED  ->  %s", drone.getName()), StatusType.OK);
+        });
+    }   
+
 
     @FXML
     private void executeMission() {

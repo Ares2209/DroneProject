@@ -21,6 +21,9 @@
             <MenuItem text="Generate Python Script" onAction="#generateScript"/>
             <MenuItem text="Execute Mission"         onAction="#executeMission"/>
         </Menu>
+        <Menu text="DRONE">
+            <MenuItem text="Select Drone" onAction="#SelectNewDrone"/>
+        </Menu>
     </MenuBar>
 
     <HBox VBox.vgrow="ALWAYS">

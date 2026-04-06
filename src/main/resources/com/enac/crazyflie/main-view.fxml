@@ -70,9 +70,11 @@
 
         <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" styleClass="canvas-pane">
             <StackPane VBox.vgrow="ALWAYS" styleClass="canvas-wrapper">
-                <Canvas fx:id="trajectoryCanvas"
-                        width="600" height="400"
-                        onMouseClicked="#canvasClicked"/>
+                <Canvas fx:id="trajectoryCanvas" 
+        		onMousePressed="#handleMousePressed" 
+        		onMouseDragged="#handleMouseDragged" 
+        		onMouseReleased="#handleMouseReleased" 
+        		width="800.0" height="400.0" />
             </StackPane>
         </VBox>
 

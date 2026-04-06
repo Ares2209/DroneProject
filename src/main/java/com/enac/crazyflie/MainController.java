@@ -26,8 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class MainController {
 
+public class MainController { //je précise que je taffe sur geddit la team, donc l'indentation je m'en bats un peu la race avec respect.
+
+    private Waypoint draggedWaypoint = null; //Mémorise quel waypoint est en train d'être déplacé
+    
     @FXML private Canvas    trajectoryCanvas;
     @FXML private TextField altitudeField;
     @FXML private TextField velocityField;
@@ -35,33 +38,77 @@ public class MainController {
 
     private final List<Waypoint> waypoints = new ArrayList<>();
     private boolean drawing = false;
+    private boolean modifying = false; //Je rajoute ce mode parce que faut expliciter le fait que les deux modes ne puissent pas coexister. 
 
     @FXML
     private void initialize() {
         drawTrajectory();
         setStatus("READY", StatusType.OK);
     }
+    //Calcule la distance entre le clic et le waypoint (on peut pas attraper un waypoint au pixel près).
+    private double pointDistance(double x1, double y1, double x2, double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    @FXML
+    private void handleMousePressed(MouseEvent event) {
+        double wx = event.getX() - trajectoryCanvas.getWidth() / 2.0;
+        double wy = -(event.getY() - trajectoryCanvas.getHeight() / 2.0);
+
+        if (modifying) {
+            for (Waypoint wp : waypoints) {
+                if (pointDistance(wx, wy, wp.getX(), wp.getY()) <= 15.0) { //le "15" représente les pixels (on cliquera jamais au pixel près sur le bon waypoint).
+                    draggedWaypoint = wp; //le point attrapé est mémorisé. 
+                    return; 
+                }
+            }
+        }
+        //j'ai supprimé "canvasClicked" mais ça faisiat ni plus ni moins que ce qui se trouve dans la boucle else ci dessous.
+        else if (drawing) {
+            double alt = parseDouble(altitudeField.getText(), 1.0);
+            waypoints.add(new Waypoint(wx, wy, alt));
+            drawTrajectory();
+            setStatus(String.format("WP%02d  ->  X:%.0f  Y:%.0f  ALT:%.1fm",
+                    waypoints.size(), wx, wy, alt), StatusType.OK);
+        }
+    }
+    
+    @FXML
+    private void handleMouseDragged(MouseEvent event) {
+        //Si un waypoint est sélectionné, on met à jour ses coordonnées pendant le glissement
+        if (draggedWaypoint != null) { //=> la condition suppose qu'on est forcément en mode "modifying" puisque sinon draggedWaypoint est nul.
+            double wx = event.getX() - trajectoryCanvas.getWidth() / 2.0;
+            double wy = -(event.getY() - trajectoryCanvas.getHeight() / 2.0);
+            
+            draggedWaypoint.setX(wx);
+            draggedWaypoint.setY(wy);
+            
+            drawTrajectory();
+            setStatus(String.format("MOVING WP  ->  X:%.0f  Y:%.0f", wx, wy), StatusType.IDLE);
+        }
+    }
 
     @FXML
-    private void canvasClicked(MouseEvent event) {
-        if (!drawing) return;
-        double wx  = event.getX() - trajectoryCanvas.getWidth()  / 2.0;
-        double wy  = -(event.getY() - trajectoryCanvas.getHeight() / 2.0);
-        double alt = parseDouble(altitudeField.getText(), 1.0);
-        waypoints.add(new Waypoint(wx, wy, alt));
-        drawTrajectory();
-        setStatus(String.format("WP%02d  ->  X:%.0f  Y:%.0f  ALT:%.1fm",
-                waypoints.size(), wx, wy, alt), StatusType.OK);
+    private void handleMouseReleased(MouseEvent event) {
+        //On relâche le waypoint à la fin du clic/glissement
+        if (draggedWaypoint != null) {
+            draggedWaypoint = null;
+            setStatus("WAYPOINT MOVED", StatusType.OK);
+        }
     }
 
     @FXML 
     public void startDrawing() {
         drawing = true;
+        modifying = false;
         setStatus("DRAWING MODE  -  CLICK ON MAP TO ADD WAYPOINTS", StatusType.OK);
     }
 
     @FXML 
     public void stopDrawing() {
+    	modifying = true;
         drawing = false;
         setStatus("DRAWING STOPPED  -  " + waypoints.size() + " WAYPOINTS RECORDED", StatusType.IDLE);
     }
@@ -72,6 +119,8 @@ public class MainController {
     }
     @FXML 
     public void ModWaypointStatut() {
+    	modifying = true; //j'ai rajouté ici mais pas sûre que ce soit nécessaire
+    	drawing = false;
         setStatus("Modification Waypoint", StatusType.IDLE);
     }
 
@@ -476,11 +525,11 @@ public class MainController {
         a.showAndWait();
     }
 
-    public static class Waypoint {
+    public static class Waypoint { //On enlève le "final" pour rendre les coordonnées modifiables
 
-        @JsonProperty("x")        private final double x;
-        @JsonProperty("y")        private final double y;
-        @JsonProperty("altitude") private final double altitude;
+        @JsonProperty("x")        private double x;
+        @JsonProperty("y")        private double y;
+        @JsonProperty("altitude") private double altitude;
 
         @JsonCreator
         public Waypoint(
@@ -495,5 +544,8 @@ public class MainController {
         public double getX()        { return x; }
         public double getY()        { return y; }
         public double getAltitude() { return altitude; }
+        
+        public void setX(double x)  { this.x = x; } //ça c'est pour permettre le déplacement (je verrai plus tard mais je me pose la question concernant l'altitude)
+        public void setY(double y)  { this.y = y; }
     }
 }
